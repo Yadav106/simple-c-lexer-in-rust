@@ -1,5 +1,12 @@
 #![allow(unused)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
+pub enum Preprocessor {
+    Define,
+    Include,
+    Invalid,
+}
+
+#[derive(Debug, PartialEq)]
 pub enum Keyword {
     Auto,
     Break,
@@ -35,7 +42,7 @@ pub enum Keyword {
     While,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Punctuation {
     Comma,
     Dot,
@@ -46,19 +53,19 @@ pub enum Punctuation {
     LBraces,
     RSqBracket,
     LSqBracket,
+    LAngleBracket,
+    RAngleBracket,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Operator {
     Plus,
     Minus,
     Divide,
     Multiply,
-    Lesser,
-    Greater,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Token {
     Keyword(Keyword),
     Identifier(String),
@@ -67,4 +74,6 @@ pub enum Token {
     Punctuation(Punctuation),
     Character(char),
     Number(i64),
+    Preprocessor(Preprocessor),
+    EOF,
 }
