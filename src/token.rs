@@ -3,7 +3,6 @@
 pub enum Preprocessor {
     Define,
     Include,
-    Invalid,
 }
 
 #[derive(Debug, PartialEq)]
@@ -66,10 +65,16 @@ pub enum Operator {
 }
 
 #[derive(Debug, PartialEq)]
+pub enum Literal {
+    String(String),
+    Char(char),
+}
+
+#[derive(Debug, PartialEq)]
 pub enum Token {
     Keyword(Keyword),
     Identifier(String),
-    Literal(String),
+    Literal(Literal),
     Operator(Operator),
     Punctuation(Punctuation),
     Character(char),

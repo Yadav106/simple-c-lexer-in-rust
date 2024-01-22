@@ -1,5 +1,6 @@
 #![allow(unused)]
-use crate::token::Token;
+
+use crate::token::{Literal, Token};
 
 pub struct Lexer<'a> {
     input: &'a str,
@@ -28,17 +29,19 @@ impl<'a> Lexer<'a> {
 
         let current_char = self.input.chars().nth(self.position).unwrap();
 
-        if current_char.is_digit(10) {
-            return Token::Number(self.read_number());
-        }
-
         match current_char {
             '#' => {
                 return Token::Preprocessor(self.read_preprocessor());
             }
+            '\'' | '"' => {
+                return Token::Literal(self.read_literal());
+            }
+            c if c.is_digit(10) => {
+                return Token::Number(self.read_number());
+            }
+            // c if c.is_ascii_punctuation() => return,
             _ => {
-                println!("Invalid char {}", current_char);
-                return Token::EOF;
+                panic!("Invalid char {}", current_char);
             }
         }
 
@@ -56,6 +59,62 @@ impl<'a> Lexer<'a> {
         {
             self.position += 1;
         }
+    }
+
+    fn read_literal(&mut self) -> crate::token::Literal {
+        let start = self.position;
+        let initial_char = self.input.chars().nth(self.position).unwrap();
+
+        self.position += 1;
+
+        while self.position < self.input.len() {
+            match self.input.chars().nth(self.position).unwrap() {
+                '\n' => {
+                    panic!(
+                        "Requires ` {} ` in  ` {} `",
+                        initial_char,
+                        &self.input[start..self.position]
+                    );
+                }
+                current_character if current_character == initial_char => {
+                    self.position += 1;
+                    match initial_char {
+                        '"' => {
+                            // string literal
+                            return Literal::String(
+                                self.input[start + 1..self.position - 1].to_string(),
+                            );
+                        }
+                        '\'' => {
+                            // character literal
+                            let valid_char_len = 3;
+                            let char_len = self.position - start;
+
+                            if char_len < valid_char_len {
+                                panic!("char cannot be empty");
+                            }
+                            if char_len != valid_char_len {
+                                panic!("More than one character in data type char, use \" for including multiple characters : {}", self.input[start+1..self.position-1].to_string());
+                            }
+                            return Literal::Char(
+                                self.input.chars().nth(self.position - 2).unwrap(),
+                            );
+                        }
+                        _ => {
+                            panic!(
+                                "Invalid syntax {}",
+                                self.input[start..self.position].to_string()
+                            );
+                        }
+                    }
+                }
+                _ => {
+                    self.position += 1;
+                }
+            }
+        }
+
+        return Literal::String(String::from(""));
     }
 
     fn read_number(&mut self) -> i64 {
@@ -88,8 +147,7 @@ impl<'a> Lexer<'a> {
             "#include" => crate::token::Preprocessor::Include,
             "#define" => crate::token::Preprocessor::Define,
             _ => {
-                println!("Invalid preprocessor {}", preprocessor_str);
-                crate::token::Preprocessor::Invalid
+                panic!("Invalid preprocessor {}", preprocessor_str)
             }
         }
     }
