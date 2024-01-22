@@ -39,7 +39,9 @@ impl<'a> Lexer<'a> {
             c if c.is_digit(10) => {
                 return Token::Number(self.read_number());
             }
-            // c if c.is_ascii_punctuation() => return,
+            c if c.is_ascii_punctuation() => {
+                return self.read_punctuation();
+            }
             _ => {
                 panic!("Invalid char {}", current_char);
             }
@@ -59,6 +61,30 @@ impl<'a> Lexer<'a> {
         {
             self.position += 1;
         }
+    }
+
+    fn read_punctuation(&mut self) -> Token {
+        let current_char = self.input.chars().nth(self.position).unwrap();
+        self.position += 1;
+        match current_char {
+            '+' => return Token::Operator(crate::token::Operator::Plus),
+            '-' => return Token::Operator(crate::token::Operator::Minus),
+            '/' => return Token::Operator(crate::token::Operator::Divide),
+            '*' => return Token::Operator(crate::token::Operator::Multiply),
+            ',' => return Token::Punctuation(crate::token::Punctuation::Comma),
+            '.' => return Token::Punctuation(crate::token::Punctuation::Dot),
+            ';' => return Token::Punctuation(crate::token::Punctuation::Semicolon),
+            '(' => return Token::Punctuation(crate::token::Punctuation::LParanthesis),
+            ')' => return Token::Punctuation(crate::token::Punctuation::RParanthesis),
+            '{' => return Token::Punctuation(crate::token::Punctuation::LBraces),
+            '}' => return Token::Punctuation(crate::token::Punctuation::RBraces),
+            '[' => return Token::Punctuation(crate::token::Punctuation::LSqBracket),
+            ']' => return Token::Punctuation(crate::token::Punctuation::RSqBracket),
+            '<' => return Token::Punctuation(crate::token::Punctuation::LAngleBracket),
+            '>' => return Token::Punctuation(crate::token::Punctuation::RAngleBracket),
+            _ => panic!("Invalid character {}", current_char),
+        }
+        return Token::Punctuation(crate::token::Punctuation::Comma);
     }
 
     fn read_literal(&mut self) -> crate::token::Literal {

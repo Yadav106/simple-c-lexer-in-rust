@@ -77,7 +77,6 @@ pub enum Token {
     Literal(Literal),
     Operator(Operator),
     Punctuation(Punctuation),
-    Character(char),
     Number(i64),
     Preprocessor(Preprocessor),
     EOF,
