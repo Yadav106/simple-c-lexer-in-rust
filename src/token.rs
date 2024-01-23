@@ -79,5 +79,6 @@ pub enum Token {
     Punctuation(Punctuation),
     Number(i64),
     Preprocessor(Preprocessor),
+    Comment,
     EOF,
 }

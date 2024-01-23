@@ -125,9 +125,21 @@ impl<'a> Lexer<'a> {
         let current_char = self.input.chars().nth(self.position).unwrap();
         self.position += 1;
         match current_char {
+            '/' => {
+                if self.position < self.input.len() - 1 {
+                    if self.input.chars().nth(self.position).unwrap() == '/' {
+                        while self.position < self.input.len()
+                            && self.input.chars().nth(self.position).unwrap() != '\n'
+                        {
+                            self.position += 1;
+                        }
+                        return Token::Comment;
+                    }
+                }
+                return Token::Operator(crate::token::Operator::Divide);
+            }
             '+' => return Token::Operator(crate::token::Operator::Plus),
             '-' => return Token::Operator(crate::token::Operator::Minus),
-            '/' => return Token::Operator(crate::token::Operator::Divide),
             '*' => return Token::Operator(crate::token::Operator::Multiply),
             ',' => return Token::Punctuation(crate::token::Punctuation::Comma),
             '.' => return Token::Punctuation(crate::token::Punctuation::Dot),
