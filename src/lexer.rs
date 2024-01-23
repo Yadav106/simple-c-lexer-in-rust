@@ -49,8 +49,6 @@ impl<'a> Lexer<'a> {
                 panic!("Invalid char {}", current_char);
             }
         }
-
-        return Token::EOF;
     }
 
     fn skip_whitespace(&mut self) {
@@ -126,6 +124,7 @@ impl<'a> Lexer<'a> {
         self.position += 1;
         match current_char {
             '/' => {
+                // logic for comment
                 if self.position < self.input.len() - 1 {
                     if self.input.chars().nth(self.position).unwrap() == '/' {
                         while self.position < self.input.len()
@@ -154,7 +153,6 @@ impl<'a> Lexer<'a> {
             '>' => return Token::Punctuation(crate::token::Punctuation::RAngleBracket),
             _ => panic!("Invalid character {}", current_char),
         }
-        return Token::Punctuation(crate::token::Punctuation::Comma);
     }
 
     fn read_literal(&mut self) -> crate::token::Literal {
