@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use crate::token::{Literal, Token};
+use crate::token::{Keyword, Literal, Token};
 
 pub struct Lexer<'a> {
     input: &'a str,
@@ -42,6 +42,9 @@ impl<'a> Lexer<'a> {
             c if c.is_ascii_punctuation() => {
                 return self.read_punctuation();
             }
+            c if c.is_alphabetic() => {
+                return self.read_alphabet();
+            }
             _ => {
                 panic!("Invalid char {}", current_char);
             }
@@ -61,6 +64,61 @@ impl<'a> Lexer<'a> {
         {
             self.position += 1;
         }
+    }
+
+    fn read_alphabet(&mut self) -> Token {
+        let start = self.position;
+
+        while self.position < self.input.len()
+            && self
+                .input
+                .chars()
+                .nth(self.position)
+                .unwrap()
+                .is_alphabetic()
+        {
+            self.position += 1;
+        }
+
+        let current_word = &self.input[start..self.position];
+
+        match current_word {
+            "auto" => return Token::Keyword(Keyword::Auto),
+            "break" => return Token::Keyword(Keyword::Break),
+            "case" => return Token::Keyword(Keyword::Case),
+            "char" => return Token::Keyword(Keyword::Char),
+            "const" => return Token::Keyword(Keyword::Const),
+            "continue" => return Token::Keyword(Keyword::Continue),
+            "default" => return Token::Keyword(Keyword::Default),
+            "do" => return Token::Keyword(Keyword::Do),
+            "double" => return Token::Keyword(Keyword::Double),
+            "else" => return Token::Keyword(Keyword::Else),
+            "enum" => return Token::Keyword(Keyword::Enum),
+            "extern" => return Token::Keyword(Keyword::Extern),
+            "float" => return Token::Keyword(Keyword::Float),
+            "for" => return Token::Keyword(Keyword::For),
+            "goto" => return Token::Keyword(Keyword::Goto),
+            "if" => return Token::Keyword(Keyword::If),
+            "int" => return Token::Keyword(Keyword::Int),
+            "long" => return Token::Keyword(Keyword::Long),
+            "register" => return Token::Keyword(Keyword::Register),
+            "return" => return Token::Keyword(Keyword::Return),
+            "short" => return Token::Keyword(Keyword::Short),
+            "signed" => return Token::Keyword(Keyword::Signed),
+            "sizeof" => return Token::Keyword(Keyword::Sizeof),
+            "static" => return Token::Keyword(Keyword::Sizeof),
+            "struct" => return Token::Keyword(Keyword::Struct),
+            "switch" => return Token::Keyword(Keyword::Switch),
+            "typedef" => return Token::Keyword(Keyword::Typedef),
+            "union" => return Token::Keyword(Keyword::Union),
+            "unsigned" => return Token::Keyword(Keyword::Unsigned),
+            "void" => return Token::Keyword(Keyword::Void),
+            "volatile" => return Token::Keyword(Keyword::Volatile),
+            "while" => return Token::Keyword(Keyword::While),
+            _ => {}
+        }
+
+        return Token::Identifier(self.input[start..self.position].to_string());
     }
 
     fn read_punctuation(&mut self) -> Token {
