@@ -51,7 +51,10 @@ impl<'a> Lexer<'a> {
                 return self.read_alphabet();
             }
             _ => {
-                panic!("Invalid char {} on line {}", current_char, self.line_number);
+                panic!(
+                    "line {} : Invalid char ` {} `",
+                    self.line_number, current_char
+                );
             }
         }
     }
@@ -254,7 +257,10 @@ impl<'a> Lexer<'a> {
             "#include" => crate::token::Preprocessor::Include,
             "#define" => crate::token::Preprocessor::Define,
             _ => {
-                panic!("Invalid preprocessor {}", preprocessor_str)
+                panic!(
+                    "line {} : Invalid preprocessor {}",
+                    self.line_number, preprocessor_str
+                )
             }
         }
     }
