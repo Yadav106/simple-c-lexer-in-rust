@@ -5,11 +5,16 @@ use crate::token::{Keyword, Literal, Token};
 pub struct Lexer<'a> {
     input: &'a str,
     position: usize,
+    line_number: usize,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(input: &'a str) -> Self {
-        Lexer { input, position: 0 }
+        Lexer {
+            input,
+            position: 0,
+            line_number: 1,
+        }
     }
 
     pub fn print_input(&self) {
@@ -46,7 +51,7 @@ impl<'a> Lexer<'a> {
                 return self.read_alphabet();
             }
             _ => {
-                panic!("Invalid char {}", current_char);
+                panic!("Invalid char {} on line {}", current_char, self.line_number);
             }
         }
     }
@@ -60,6 +65,9 @@ impl<'a> Lexer<'a> {
                 .unwrap()
                 .is_whitespace()
         {
+            if let '\n' = self.input.chars().nth(self.position).unwrap() {
+                self.line_number += 1;
+            }
             self.position += 1;
         }
     }
@@ -165,9 +173,10 @@ impl<'a> Lexer<'a> {
             match self.input.chars().nth(self.position).unwrap() {
                 '\n' => {
                     panic!(
-                        "Requires ` {} ` in  ` {} `",
+                        "line {} : Requires ` {} ` in  ` {} `",
+                        self.line_number,
                         initial_char,
-                        &self.input[start..self.position]
+                        &self.input[start..self.position],
                     );
                 }
                 current_character if current_character == initial_char => {
@@ -185,10 +194,10 @@ impl<'a> Lexer<'a> {
                             let char_len = self.position - start;
 
                             if char_len < valid_char_len {
-                                panic!("char cannot be empty");
+                                panic!("line {} : char cannot be empty", self.line_number);
                             }
                             if char_len != valid_char_len {
-                                panic!("More than one character in data type char, use \" for including multiple characters : {}", self.input[start+1..self.position-1].to_string());
+                                panic!("line {}, More than one character in data type char, use \" for including multiple characters : {}", self.line_number, self.input[start+1..self.position-1].to_string());
                             }
                             return Literal::Char(
                                 self.input.chars().nth(self.position - 2).unwrap(),
@@ -196,7 +205,8 @@ impl<'a> Lexer<'a> {
                         }
                         _ => {
                             panic!(
-                                "Invalid syntax {}",
+                                "line {} : Invalid syntax {}",
+                                self.line_number,
                                 self.input[start..self.position].to_string()
                             );
                         }
