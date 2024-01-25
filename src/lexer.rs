@@ -159,7 +159,10 @@ impl<'a> Lexer<'a> {
             ']' => return Token::Punctuation(crate::token::Punctuation::RSqBracket),
             '<' => return Token::Punctuation(crate::token::Punctuation::LAngleBracket),
             '>' => return Token::Punctuation(crate::token::Punctuation::RAngleBracket),
-            _ => panic!("Invalid character {}", current_char),
+            _ => panic!(
+                "line {} : Invalid character ` {} `",
+                self.line_number, current_char
+            ),
         }
     }
 
